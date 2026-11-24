@@ -1,0 +1,97 @@
+{
+  "scale": {
+    "tests": 20400,
+    "days": 184,
+    "commits": 501,
+    "modules": 306,
+    "coverage_edges": 163171,
+    "observed_coverage_edges": 149946,
+    "baseline_wall_sec": 2976.6826769678405,
+    "nightly_full_runs": 184
+  },
+  "safe": {
+    "avg_selected": 4334.842315369261,
+    "avg_skipped": 16065.15768463074,
+    "skip_ratio": 0.7875077296387617,
+    "avg_duration_sec": 640.1309333054892,
+    "duration_reduction": 0.784951571002674,
+    "all_true_failures": 11303,
+    "missed_true_failures": 2,
+    "true_failure_miss_rate": 0.00017694417411306734,
+    "new_true_failures": 186,
+    "missed_new_true_failures": 0,
+    "new_failure_miss_rate": 0.0,
+    "avg_predicted_missed_per_commit": 0.02249588895694334,
+    "flaky_failures_seen": 25396
+  },
+  "fast": {
+    "avg_selected": 3201.147704590818,
+    "skip_ratio": 0.8430809948729991,
+    "avg_duration_sec": 527.6129841199064,
+    "duration_reduction": 0.822751350621843,
+    "true_failure_miss_rate": 0.0012386092187914714,
+    "new_failure_miss_rate": 0.05913978494623656,
+    "missed_new": 11,
+    "new_true": 186
+  },
+  "nightly_amortized": {
+    "avg_tests_per_commit": 11827.057884231537,
+    "test_reduction": 0.4202422605768854,
+    "avg_duration_sec_per_commit": 1733.3636929104448,
+    "duration_reduction": 0.4176861019407976,
+    "note": "将每天一次全量兜底成本摊到当天提交后的每次平均"
+  },
+  "detection": {
+    "detected_count": 281,
+    "classifications": {
+      "stable": 102,
+      "flaky": 186,
+      "broken_episode": 20,
+      "broken": 25,
+      "flaky_then_broken": 95
+    },
+    "mixed_sha_tests": 314
+  },
+  "accuracy": {
+    "tp": 279,
+    "fp": 2,
+    "fn": 0,
+    "tn": 20119,
+    "precision": 0.9928825622775801,
+    "recall": 1.0,
+    "f1": 0.9964285714285714,
+    "accuracy": 0.9999019607843137,
+    "false_positive_ids": [
+      2949,
+      7450
+    ],
+    "false_negative_ids": [],
+    "cause_accuracy": 0.8195488721804511,
+    "cause_correct": 218,
+    "cause_total": 266,
+    "transition_total": 39,
+    "transition_correct": 37,
+    "wrong_masked_bad_pairs": 0,
+    "bad_episode_test_pairs": 150,
+    "transition_not_escalated_12_runs": 0
+  },
+  "quarantine_events": {
+    "broken_detected": 64,
+    "broken_resolved": 57,
+    "escalate_broken": 297,
+    "quarantined": 408,
+    "released": 115
+  },
+  "current_status": {
+    "broken_suspect": 91,
+    "healthy": 126,
+    "quarantined": 211
+  },
+  "cause_distribution_truth": {
+    "concurrency": 64,
+    "external_dependency": 31,
+    "order_dependence": 81,
+    "shared_state": 47,
+    "time_or_timeout": 56
+  }
+}

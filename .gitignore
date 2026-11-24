@@ -16,3 +16,10 @@ node_modules/
 __pycache__/
 .venv/
 venv/
+
+# Generated large simulation artifacts
+data/*.sqlite3
+data/*.sqlite3-wal
+data/*.sqlite3-shm
+generated_repo/
+.pytest_cache/

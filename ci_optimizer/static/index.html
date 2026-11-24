@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>大仓 CI 智能选词与不稳定测试平台</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">CI</div>
+      <div>
+        <div class="brand-title">Test Pulse</div>
+        <div class="brand-sub">大仓智能测试平台</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="overview">总览</button>
+      <button class="nav-btn" data-view="commits">提交与选词</button>
+      <button class="nav-btn" data-view="flaky">不稳定测试</button>
+      <button class="nav-btn" data-view="quarantine">隔离与事件</button>
+      <button class="nav-btn" data-view="report">报告</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="dot"></div>
+      <span>SQLite 模拟数据 · 可离线运行</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="page-title">半年 CI 回放总览</h1>
+        <p id="page-sub">20,400 个测试、模块依赖图、历史覆盖、共同失败概率与夜间全量兜底</p>
+      </div>
+      <div class="top-actions">
+        <span class="pill" id="data-state">加载中…</span>
+        <button class="secondary" id="refresh-btn">刷新</button>
+      </div>
+    </header>
+
+    <section id="view-overview" class="view active">
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <div class="grid two-one">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>每次提交的安全档选词量</h2>
+              <p>按提交时间正序；红色点表示当次存在真实失败漏检，夜间全量会补抓。</p>
+            </div>
+          </div>
+          <div id="selection-trend" class="chart-wrap"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>策略对比</h2></div>
+          <div id="tier-table"></div>
+        </div>
+      </div>
+
+      <div class="grid two-one">
+        <div class="card">
+          <div class="card-head"><h2>漏检校准</h2></div>
+          <div id="miss-calibration"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>识别质量</h2></div>
+          <div id="quality-panel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-commits" class="view">
+      <div class="commit-layout">
+        <div class="card commit-list-card">
+          <div class="card-head">
+            <h2>提交历史</h2>
+            <input id="commit-search" class="input" placeholder="筛选 message / 域…" />
+          </div>
+          <div class="table-scroll commit-table-scroll">
+            <table class="table compact" id="commit-table">
+              <thead>
+                <tr><th>提交</th><th>选词</th><th>真实失败</th><th>漏检</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="commit-detail">
+          <div class="card" id="commit-summary-card">
+            <div class="empty">从左侧选择一次提交，查看挑中的测试与原因。</div>
+          </div>
+          <div class="card hidden" id="run-report-card">
+            <div class="card-head">
+              <div><h2>本次运行报告</h2><p>开发者通知视图：跳过数量、真实失败、已知不稳定失败和夜间兜底状态。</p></div>
+            </div>
+            <pre id="run-report-content" class="report-md run-report-inline"></pre>
+          </div>
+          <div class="card hidden" id="commit-files-card">
+            <div class="card-head"><h2>本次改动文件</h2></div>
+            <div id="commit-files" class="chips"></div>
+          </div>
+          <div class="card hidden" id="selected-table-card">
+            <div class="card-head">
+              <div>
+                <h2>挑选出的测试与原因</h2>
+                <p id="selected-count-label"></p>
+              </div>
+              <input id="test-search" class="input" placeholder="筛选 nodeid / owner / 原因…" />
+            </div>
+            <div class="table-scroll selected-scroll">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>风险</th><th>测试</th><th>Suite</th><th>预计耗时</th><th>选择原因</th>
+                  </tr>
+                </thead>
+                <tbody id="selected-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <button class="secondary" id="prev-page">上一页</button>
+              <span id="page-info"></span>
+              <button class="secondary" id="next-page">下一页</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-flaky" class="view">
+      <div class="card">
+        <div class="card-head flaky-head">
+          <div>
+            <h2>不稳定测试列表</h2>
+            <p>统计同一 SHA 是否既过又不过、翻转次数、重跑恢复、失败边界与可能原因。</p>
+          </div>
+          <div class="filters">
+            <select id="flaky-filter" class="input">
+              <option value="detected">系统识别为不稳定/转变</option>
+              <option value="quarantined">隔离中</option>
+              <option value="broken_suspect">疑似提交破坏</option>
+              <option value="healthy">已恢复</option>
+              <option value="truth">模拟真值：全部 flaky</option>
+              <option value="all">所有有失败记录</option>
+            </select>
+            <input id="flaky-search" class="input" placeholder="搜索测试 / owner / 域…" />
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="table hover" id="flaky-table">
+            <thead>
+              <tr>
+                <th>测试</th><th>状态/分类</th><th>通过率</th><th>Flake 分</th>
+                <th>混合 SHA</th><th>翻转</th><th>主要原因</th><th>真值</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="flaky-detail" class="flaky-detail hidden"></div>
+    </section>
+
+    <section id="view-quarantine" class="view">
+      <div class="card">
+        <div class="card-head">
+          <div><h2>隔离、升级与自动放回事件</h2><p>隔离测试仍在 allow-failure job 中运行并记录；连续绿色且统计上稳定后自动解除。</p></div>
+        </div>
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>Seq</th><th>时间</th><th>测试</th><th>事件</th><th>原因</th><th>分数</th></tr></thead>
+            <tbody id="events-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-report" class="view">
+      <div class="card report-card">
+        <div class="card-head"><h2>运行报告</h2><button class="secondary" id="reload-report">重新加载</button></div>
+        <pre id="report-content" class="report-md">加载中…</pre>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
